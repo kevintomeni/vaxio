@@ -2,42 +2,62 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vaxio/utils/index.dart';
 
-class Loadingpage extends StatefulWidget {
-  const Loadingpage({super.key});
+class LoadingPage extends StatefulWidget {
+  const LoadingPage({super.key});
 
   @override
-  State<Loadingpage> createState() => _LoadingpageState();
+  State<LoadingPage> createState() => _LoadingPageState();
 }
 
-class _LoadingpageState extends State<Loadingpage>
+class _LoadingPageState extends State<LoadingPage>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<Offset> _logoAnimation;
-  late Animation<Offset> _textAnimation;
+  late final AnimationController _controller;
+  late final Animation<Offset> _logoAnimation;
+  late final Animation<Offset> _textAnimation;
 
   @override
   void initState() {
     super.initState();
+
+    // Initialisation de l'AnimationController
     _controller = AnimationController(
       duration: const Duration(seconds: 1),
       vsync: this,
     );
 
-    _logoAnimation = Tween<Offset>(
+    // Animation pour le logo
+    _logoAnimation = _createSlideAnimation(
       begin: const Offset(0, -1.0),
       end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    );
 
-    _textAnimation = Tween<Offset>(
+    // Animation pour le texte
+    _textAnimation = _createSlideAnimation(
       begin: const Offset(0, 1.0),
       end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    );
 
+    // Démarrage de l'animation et navigation après un délai
+    _startAnimation();
+  }
+
+  // Méthode pour créer une animation de type SlideTransition
+  Animation<Offset> _createSlideAnimation({
+    required Offset begin,
+    required Offset end,
+  }) {
+    return Tween<Offset>(
+      begin: begin,
+      end: end,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+  }
+
+  // Méthode pour démarrer l'animation et gérer la navigation
+  void _startAnimation() {
     _controller.forward().then((_) {
       Future.delayed(const Duration(seconds: 1), () {
         if (mounted) {
-          // Redirige vers la page d'onboarding
-          context.go('/onboarding');
+          context.go(AppConstants.routeOnboarding);
         }
       });
     });
@@ -52,27 +72,32 @@ class _LoadingpageState extends State<Loadingpage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            alignment: Alignment.center,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SlideTransition(
-                  position: _logoAnimation,
-                  child: Image.asset('assets/images/logo.png', width: 200),
-                ),
-                const SizedBox(height: 20),
-                SlideTransition(
-                  position: _textAnimation,
-                  child: Text('Vaxio', style: AppTextStyles.h1),
-                ),
-              ],
-            ),
-          ),
-        ],
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildAnimatedLogo(),
+            const SizedBox(height: 20),
+            _buildAnimatedText(),
+          ],
+        ),
       ),
+    );
+  }
+
+  // Méthode pour construire le logo animé
+  Widget _buildAnimatedLogo() {
+    return SlideTransition(
+      position: _logoAnimation,
+      child: Image.asset('assets/images/logo.png', width: 200),
+    );
+  }
+
+  // Méthode pour construire le texte animé
+  Widget _buildAnimatedText() {
+    return SlideTransition(
+      position: _textAnimation,
+      child: Text('Vaxio', style: AppTextStyles.h1),
     );
   }
 }

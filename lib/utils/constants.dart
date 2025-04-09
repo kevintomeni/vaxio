@@ -2,6 +2,10 @@ class AppConstants {
   // Noms de routes
   static const String routeLoading = '/';
   static const String routeHome = '/home';
+  static const String routeOnboarding = '/onboarding';
+  static const String routeLoadingPage = '/loading';
+  static const String routeSignIn = '/sign-in';
+  static const String routeSignUp = '/sign-up';
 
   // Durées d'animation
   static const int animationDurationShort = 200;
