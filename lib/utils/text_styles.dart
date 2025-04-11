@@ -3,6 +3,12 @@ import 'app_colors.dart';
 
 class AppTextStyles {
   // Titres
+  static const TextStyle h0 = TextStyle(
+    fontSize: 40,
+    fontWeight: FontWeight.bold,
+    color: AppColors.textPrimary,
+    fontFamily: 'poppins',
+  );
   static const TextStyle h1 = TextStyle(
     fontSize: 32,
     fontWeight: FontWeight.bold,

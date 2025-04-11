@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:vaxio/utils/constants.dart';
+import 'package:vaxio/utils/index.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -76,7 +76,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingM, vertical: AppDimensions.paddingS),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -91,12 +91,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     _onboardingData.length,
                     (index) => AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      margin: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingS),
                       width: _currentPage == index ? 12 : 8,
                       height: 8,
                       decoration: BoxDecoration(
                         color: _currentPage == index ? Colors.blue : Colors.grey,
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
                       ),
                     ),
                   ),
@@ -138,7 +138,7 @@ class _OnboardingPageContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

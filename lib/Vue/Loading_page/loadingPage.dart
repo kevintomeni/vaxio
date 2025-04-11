@@ -77,7 +77,6 @@ class _LoadingPageState extends State<LoadingPage>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildAnimatedLogo(),
-            const SizedBox(height: 20),
             _buildAnimatedText(),
           ],
         ),
@@ -89,7 +88,7 @@ class _LoadingPageState extends State<LoadingPage>
   Widget _buildAnimatedLogo() {
     return SlideTransition(
       position: _logoAnimation,
-      child: Image.asset('assets/images/logo.png', width: 200),
+      child: Image.asset('assets/images/logo.png', width: 150),
     );
   }
 

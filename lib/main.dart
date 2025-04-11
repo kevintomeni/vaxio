@@ -5,8 +5,7 @@ import 'package:vaxio/Vue/Auth/sign_up_page.dart';
 import 'package:vaxio/Vue/Loading_page/loadingPage.dart';
 import 'package:vaxio/Vue/Onboarding/onboarding_page.dart';
 import 'package:vaxio/Vue/Home/home_page.dart';
-import 'package:vaxio/utils/constants.dart';
-
+import 'package:vaxio/utils/index.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -19,7 +18,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       routerConfig: GoRouter(
-        initialLocation: AppConstants.routeSignIn,
+        initialLocation: '/',
         routes: [
           GoRoute(
             path: AppConstants.routeSignUp,
