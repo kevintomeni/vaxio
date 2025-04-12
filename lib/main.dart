@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:vaxio/Vue/Auth/sign_in_page.dart';
-import 'package:vaxio/Vue/Auth/sign_up_page.dart';
+import 'package:vaxio/Vue/Auth/signIn/sign_in_page.dart';
+import 'package:vaxio/Vue/Auth/signUp/sign_up_page.dart';
 import 'package:vaxio/Vue/Loading_page/loadingPage.dart';
 import 'package:vaxio/Vue/Onboarding/onboarding_page.dart';
 import 'package:vaxio/Vue/Home/home_page.dart';

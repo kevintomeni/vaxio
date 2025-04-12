@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vaxio/utils/index.dart';
+import 'loading_cubit.dart';
 
 class LoadingPage extends StatefulWidget {
   const LoadingPage({super.key});
@@ -37,8 +39,8 @@ class _LoadingPageState extends State<LoadingPage>
       end: Offset.zero,
     );
 
-    // Démarrage de l'animation et navigation après un délai
-    _startAnimation();
+    // Démarrage de l'animation
+    _controller.forward();
   }
 
   // Méthode pour créer une animation de type SlideTransition
@@ -52,17 +54,6 @@ class _LoadingPageState extends State<LoadingPage>
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
   }
 
-  // Méthode pour démarrer l'animation et gérer la navigation
-  void _startAnimation() {
-    _controller.forward().then((_) {
-      Future.delayed(const Duration(seconds: 1), () {
-        if (mounted) {
-          context.go(AppConstants.routeOnboarding);
-        }
-      });
-    });
-  }
-
   @override
   void dispose() {
     _controller.dispose();
@@ -71,14 +62,25 @@ class _LoadingPageState extends State<LoadingPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildAnimatedLogo(),
-            _buildAnimatedText(),
-          ],
+    return BlocProvider(
+      create: (_) => LoadingCubit()..startLoading(),
+      child: BlocListener<LoadingCubit, bool>(
+        listener: (context, isLoading) {
+          if (!isLoading) {
+            // Navigation vers la page suivante lorsque le chargement est terminé
+            context.go(AppConstants.routeOnboarding);
+          }
+        },
+        child: Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildAnimatedLogo(),
+                _buildAnimatedText(),
+              ],
+            ),
+          ),
         ),
       ),
     );
