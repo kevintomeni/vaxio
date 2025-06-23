@@ -1,0 +1,74 @@
+# Architecture MVC - Vaxio
+
+Cette application utilise une architecture MVC (Model-View-Controller) simple et maintenable.
+
+## Structure des dossiers
+
+```
+lib/
+├── constants/          # Constantes de l'application
+├── controllers/        # Contrôleurs (logique métier)
+├── models/            # Modèles de données
+├── services/          # Services (API, stockage, etc.)
+├── utils/             # Utilitaires et helpers
+├── views/             # Vues (écrans de l'application)
+└── widgets/           # Widgets réutilisables
+```
+
+## Composants principaux
+
+### Models
+- `UserModel` : Modèle pour les données utilisateur
+
+### Controllers
+- `AuthController` : Gestion de l'authentification
+
+### Services
+- `ApiService` : Gestion des appels API
+- `StorageService` : Gestion du stockage local
+
+### Views
+- `LoginView` : Écran de connexion
+- `HomeView` : Écran d'accueil
+
+## Utilisation
+
+1. **Créer un nouveau modèle** :
+   ```dart
+   // lib/models/example_model.dart
+   class ExampleModel {
+     final String id;
+     final String name;
+     
+     ExampleModel({required this.id, required this.name});
+   }
+   ```
+
+2. **Créer un nouveau contrôleur** :
+   ```dart
+   // lib/controllers/example_controller.dart
+   class ExampleController extends ChangeNotifier {
+     // Logique métier ici
+   }
+   ```
+
+3. **Créer une nouvelle vue** :
+   ```dart
+   // lib/views/example_view.dart
+   class ExampleView extends StatelessWidget {
+     @override
+     Widget build(BuildContext context) {
+       return Scaffold(
+         // UI ici
+       );
+     }
+   }
+   ```
+
+## Bonnes pratiques
+
+1. Gardez les modèles simples et immuables
+2. Utilisez les contrôleurs pour la logique métier
+3. Les vues ne doivent contenir que la logique d'affichage
+4. Utilisez les services pour les opérations externes
+5. Centralisez les constantes dans le dossier constants 
