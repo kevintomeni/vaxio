@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:vaxio/core/constants/app_constants.dart';
 import '../models/user_model.dart';
 import '../services/api_service.dart';
 import '../services/storage_service.dart';
-import '../constants/app_constants.dart';
 
 class AuthController extends ChangeNotifier {
   UserModel? _currentUser;
@@ -96,6 +96,45 @@ class AuthController extends ChangeNotifier {
       return false;
     }
   }
+  
+Future<bool> forgotPassword(String email) async {
+  _setLoading(true);
+  _clearError();
+  try {
+    final response = await ApiService.instance.post(
+      AppConstants.forgotPasswordEndpoint,
+      data: {
+        'email': email,
+      },
+    );
+    _setLoading(false);
+    return response.data['success'] == true;
+  } catch (e) {
+    _setError(e.toString().replaceFirst('Exception: ', ''));
+    return false;
+  }
+}
+
+Future<bool> resetPassword(String email, String code, String newPassword, String confirmPassword) async {
+  _setLoading(true);
+  _clearError();
+  try {
+    final response = await ApiService.instance.post(
+      AppConstants.resetPasswordEndpoint,
+      data: {
+        'email': email,
+        'code': code,
+        'password': newPassword,
+        'confirm_password': newPassword,
+      },
+    );
+    _setLoading(false);
+    return response.data['success'] == true;
+  } catch (e) {
+    _setError(e.toString().replaceFirst('Exception: ', ''));
+    return false;
+  }
+}
 
   Future<void> logout() async {
     _setLoading(true);

@@ -6,6 +6,8 @@ class AppConstants {
   static const String baseUrl = 'https://api.vaxio.com';
   static const String loginEndpoint = '/auth/login';
   static const String registerEndpoint = '/auth/register';
+  static const String forgotPasswordEndpoint = '/auth/forgot-password';
+  static const String resetPasswordEndpoint = '/auth/reset-password';
   
   // Storage Keys
   static const String tokenKey = 'auth_token';

@@ -1,15 +1,14 @@
 import 'package:dio/dio.dart';
-import '../constants/app_constants.dart';
+import 'package:vaxio/core/constants/app_constants.dart';
 import '../models/user_model.dart';
 
 class ApiService {
   late Dio _dio;
   static ApiService? _instance;
-  static const String baseUrl = 'http://10.0.2.2:5000/api'; // Pour l'émulateur Android
 
   ApiService._() {
     _dio = Dio(BaseOptions(
-      baseUrl: baseUrl,
+      baseUrl: AppConstants.baseUrl,
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),
       headers: {

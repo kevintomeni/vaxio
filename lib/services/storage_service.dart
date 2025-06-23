@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../constants/app_constants.dart';
+import 'package:vaxio/core/constants/app_constants.dart';
 import '../models/user_model.dart';
 
 class StorageService {

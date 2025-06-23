@@ -72,3 +72,16 @@ lib/
 3. Les vues ne doivent contenir que la logique d'affichage
 4. Utilisez les services pour les opérations externes
 5. Centralisez les constantes dans le dossier constants 
+
+## Authentification complète
+
+- **Inscription** : `/auth/register` (POST)
+- **Connexion** : `/auth/login` (POST)
+- **Mot de passe oublié** : `/auth/forgot-password` (POST)
+- **Réinitialisation du mot de passe** : `/auth/reset-password` (POST)
+- **Session** : token JWT stocké localement, ajouté dans les headers
+- **Déconnexion** : suppression du token et de l'utilisateur local
+- **Gestion d'erreur** : tous les messages d'erreur du backend sont affichés à l'utilisateur dans l'UI (ex : email inexistant, mot de passe incorrect, etc.)
+- **Tests** : des tests unitaires et widgets sont fournis pour garantir la robustesse des composants d'authentification
+
+**Pour chaque nouvelle fonctionnalité, ajoute un test et documente le comportement attendu.** 
