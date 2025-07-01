@@ -85,3 +85,22 @@ lib/
 - **Tests** : des tests unitaires et widgets sont fournis pour garantir la robustesse des composants d'authentification
 
 **Pour chaque nouvelle fonctionnalité, ajoute un test et documente le comportement attendu.** 
+
+## Authentification - Mot de passe oublié (OTP par email)
+
+### 1. Demander la réinitialisation
+- **POST** `/api/auth/forgot-password`
+- Body: `{ "email": "user@example.com" }`
+- Réponse: `{ "message": "Code OTP envoyé par email" }`
+
+### 2. Réinitialiser le mot de passe
+- **POST** `/api/auth/reset-password`
+- Body: `{ "email": "user@example.com", "code": "123456", "password": "newpass" }`
+- Réponse: `{ "message": "Mot de passe réinitialisé avec succès" }`
+
+### 3. Déconnexion
+- **POST** `/api/auth/logout`
+- Réponse: `{ "message": "Déconnexion réussie" }`
+
+### 4. Swagger
+- Documentation interactive disponible sur `/api-docs` 

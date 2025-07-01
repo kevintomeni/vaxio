@@ -6,7 +6,7 @@ class ForgotPasswordPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _emailCtrl = TextEditingController();
+    final emailCtrl = TextEditingController();
     final auth = AuthController();
     return Scaffold(
       appBar: AppBar(title: const Text('FORGOT PASSWORD.')),
@@ -17,7 +17,7 @@ class ForgotPasswordPage extends StatelessWidget {
             const Text('Enter your email to receive the confirmation code'),
             const SizedBox(height: 16),
             TextField(
-              controller: _emailCtrl,
+              controller: emailCtrl,
               decoration: const InputDecoration(labelText: 'email *'),
             ),
             const SizedBox(height: 16),
@@ -25,16 +25,16 @@ class ForgotPasswordPage extends StatelessWidget {
               onPressed: auth.isLoading
                   ? null
                   : () async {
-                      final success = await auth.forgotPassword(_emailCtrl.text);
+                      final success = await auth.forgotPassword(emailCtrl.text);
                       if (success) {
                         // Naviguer vers la page de saisie du code
-                        Navigator.pushNamed(context, '/verify', arguments: _emailCtrl.text);
+                        Navigator.pushNamed(context, '/verify', arguments: emailCtrl.text);
                       }
                     },
-              child: auth.isLoading ? CircularProgressIndicator() : Text('Envoyer'),
+              child: auth.isLoading ? const CircularProgressIndicator() : const Text('Envoyer'),
             ),
             if (auth.error != null)
-              Text(auth.error!, style: TextStyle(color: Colors.red)),
+              Text(auth.error!, style: const TextStyle(color: Colors.red)),
           ],
         ),
       ),

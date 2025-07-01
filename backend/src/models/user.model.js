@@ -32,7 +32,9 @@ const userSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  otpCode: { type: String },
+  otpExpires: { type: Date },
 });
 
 // Crypter le mot de passe avant la sauvegarde

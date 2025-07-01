@@ -17,12 +17,6 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   late Animation<double> _textAnimation;
 
   @override
-  Widget build(BuildContext context) {
-    // Le reste du code est déjà présent en dehors de la sélection.
-    return Container(); // Ceci est un placeholder, le vrai contenu est déjà dans le fichier.
-  }
-
-  @override
   void initState() {
     super.initState();
     _logoController = AnimationController(
@@ -47,6 +41,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     Future.delayed(const Duration(milliseconds: 2500), () {
       Navigator.pushReplacementNamed(context, '/onboarding');
     });
+  }
 
   @override
   void dispose() {
@@ -81,6 +76,5 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
         ],
       ),
     );
-  }
   }
 }
