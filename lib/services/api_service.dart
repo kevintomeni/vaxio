@@ -141,4 +141,8 @@ class ApiService {
         return Exception(AppConstants.unknownError);
     }
   }
+
+  static void setInstance(ApiService instance) {
+    _instance = instance;
+  }
 } 

@@ -45,7 +45,7 @@ class VerifyEmailPage extends StatelessWidget {
                         Navigator.pushReplacementNamed(context, '/login');
                       }
                     },
-              child: auth.isLoading ? CircularProgressIndicator() : Text('Réinitialiser'),
+              child: auth.isLoading ? CircularProgressIndicator() : const Text('Réinitialiser'),
             ),
             if (auth.error != null)
               Text(auth.error!, style: TextStyle(color: Colors.red)),

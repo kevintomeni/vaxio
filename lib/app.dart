@@ -18,30 +18,25 @@ class VaxioApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthController()),
-        ChangeNotifierProvider(create: (_) => ThemeNotifier()),
-      ],
-      child: MaterialApp(
-        title: AppConstants.appName,
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
-        themeMode: Provider.of<ThemeNotifier>(context).mode,
-        initialRoute: AppRoutes.splash,
-        routes: {
-          AppRoutes.splash: (_) => const SplashScreen(),
-          AppRoutes.onboarding: (_) => const OnboardingScreen(),
-          AppRoutes.login: (_) => const LoginView(),
-          AppRoutes.register: (_) => const RegisterPage(),
-          AppRoutes.forgot: (_) => const ForgotPasswordPage(),
-          AppRoutes.verify: (context) {
-            final args = ModalRoute.of(context)!.settings.arguments as String;
-            return VerifyEmailPage(email: args);
-          },
-          AppRoutes.home: (_) => const HomeView(),
+    final theme = Provider.of<ThemeNotifier>(context);
+    return MaterialApp(
+      title: AppConstants.appName,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: theme.mode,
+      initialRoute: AppRoutes.splash,
+      routes: {
+        AppRoutes.splash: (_) => const SplashScreen(),
+        AppRoutes.onboarding: (_) => const OnboardingScreen(),
+        AppRoutes.login: (_) => const LoginView(),
+        AppRoutes.register: (_) => const RegisterPage(),
+        AppRoutes.forgot: (_) => const ForgotPasswordPage(),
+        AppRoutes.verify: (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as String;
+          return VerifyEmailPage(email: args);
         },
-      ),
+        AppRoutes.home: (_) => const HomeView(),
+      },
     );
   }
 }
