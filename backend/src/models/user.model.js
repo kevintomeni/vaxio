@@ -35,6 +35,12 @@ const userSchema = new mongoose.Schema({
   },
   otpCode: { type: String },
   otpExpires: { type: Date },
+  phone: {
+    type: String,
+    unique: true,
+    sparse: true,
+    match: [/^\+?[0-9]{7,15}$/, 'Veuillez fournir un numéro de téléphone valide']
+  },
 });
 
 // Crypter le mot de passe avant la sauvegarde

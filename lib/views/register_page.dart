@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../controllers/auth_controller.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../cubit/auth_cubit.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import '../widgets/social_button.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -13,80 +15,141 @@ class _RegisterPageState extends State<RegisterPage> {
   final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
+  final _confirmPassCtrl = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   String? _error;
 
   @override
   Widget build(BuildContext context) {
-    final auth = Provider.of<AuthController>(context);
-
     return Scaffold(
       appBar: AppBar(title: const Text('Create Account.')),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                controller: _nameCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'User name *',
-                  prefixIcon: Icon(Icons.person),
+      body: BlocListener<AuthCubit, AuthState>(
+        listener: (context, state) {
+          if (state is AuthAuthenticated) {
+            Navigator.pushReplacementNamed(context, '/home');
+          } else if (state is AuthError) {
+            setState(() => _error = state.message);
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              children: [
+                TextFormField(
+                  controller: _nameCtrl,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(20),),),
+                    labelText: 'User name *',
+                    prefixIcon: Icon(Icons.person),
+                  ),
+                  validator: (v) => v == null || v.isEmpty ? 'Nom requis' : null,
                 ),
-                validator: (v) => v == null || v.isEmpty ? 'Nom requis' : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _emailCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'email *',
-                  prefixIcon: Icon(Icons.email_outlined),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _emailCtrl,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(20),),),
+                    labelText: 'email *',
+                    prefixIcon: Icon(Icons.email_outlined),
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return "L'email est requis";
+                    if (!v.contains('@')) return "Email invalide";
+                    return null;
+                  },
                 ),
-                keyboardType: TextInputType.emailAddress,
-                validator: (v) {
-                  if (v == null || v.isEmpty) return "L'email est requis";
-                  if (!v.contains('@')) return "Email invalide";
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _passCtrl,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Password *',
-                  prefixIcon: Icon(Icons.lock_outline),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _passCtrl,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(20),),),
+                    labelText: 'Password *',
+                    prefixIcon: Icon(Icons.lock_outline),
+                  ),
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return "Mot de passe requis";
+                    if (v.length < 6) return "6 caractères min.";
+                    return null;
+                  },
                 ),
-                validator: (v) {
-                  if (v == null || v.isEmpty) return "Mot de passe requis";
-                  if (v.length < 6) return "6 caractères min.";
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              if (_error != null)
-                Text(_error!, style: const TextStyle(color: Colors.red)),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async {
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _confirmPassCtrl,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(20),),),
+                    labelText: 'Confirm Password *',
+                    prefixIcon: Icon(Icons.lock_outline),
+                  ),
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return "Nouveau mot de passe requis";
+                    if (_passCtrl.text != _confirmPassCtrl.text) return "Mot de passe different";
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                if (_error != null)
+                  Text(_error!, style: const TextStyle(color: Colors.red)),
+                BlocBuilder<AuthCubit, AuthState>(
+                  builder: (context, state) {
+                    final isLoading = state is AuthLoading;
+                    return SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: isLoading
+                            ? null
+                            : () {
+                                setState(() => _error = null);
+                                if (_formKey.currentState!.validate()) {
+                                  context.read<AuthCubit>().register(
+                                    _nameCtrl.text,
+                                    _emailCtrl.text,
+                                    _passCtrl.text,
+                                  );
+                                }
+                              },
+                        child: isLoading
+                            ? const CircularProgressIndicator()
+                            : const Text('Sign in'),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
+                SocialButton(
+                  label: 'S\'inscrire avec Google',
+                  assetPath: 'assets/images/google.png',
+                  onTap: () async {
                     setState(() => _error = null);
-                    if (_formKey.currentState!.validate()) {
-                      try {
-                        await auth.register(_nameCtrl.text, _emailCtrl.text, _passCtrl.text);
-                        if (context.mounted) {
-                          Navigator.pushReplacementNamed(context, '/home');
-                        }
-                      } catch (e) {
-                        setState(() => _error = e.toString());
-                      }
+                    try {
+                      final googleUser = await GoogleSignIn().signIn();
+                      if (googleUser == null) return; // Annulé
+                      final googleAuth = await googleUser.authentication;
+                      final idToken = googleAuth.idToken;
+                      if (idToken == null) throw Exception('Erreur Google');
+                      context.read<AuthCubit>().loginWithGoogle(idToken);
+                    } catch (e) {
+                      setState(() => _error = e.toString());
                     }
                   },
-                  child: const Text('Button'),
                 ),
-              ),
-            ],
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Already have an account? "),  
+                    GestureDetector(
+                      onTap: () => Navigator.pushNamed(context, '/login'),
+                      child: const Text('Sign up', style: TextStyle(color: Colors.blue)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

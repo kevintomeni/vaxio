@@ -15,17 +15,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<Map<String, String>> _pages = [
     {
-      'image': 'assets/onboarding1.png',
+      'image': 'assets/images/splash1.png',
       'title': 'Prenez le contrôle de votre santé',
       'desc': 'Accédez aux dossiers cliniques, gérez les rendez-vous, les vaccins, les suivis et bien plus encore.',
     },
     {
-      'image': 'assets/onboarding2.png',
+      'image': 'assets/images/splash2.png',
       'title': 'Prenez le contrôle de votre santé',
       'desc': 'Accédez aux dossiers cliniques, gérez les rendez-vous, les vaccins, les suivis et bien plus encore.',
     },
     {
-      'image': 'assets/onboarding3.png',
+      'image': 'assets/images/splash3.png',
       'title': 'Prenez le contrôle de votre santé',
       'desc': 'Accédez aux dossiers cliniques, gérez les rendez-vous, les vaccins, les suivis et bien plus encore.',
     },

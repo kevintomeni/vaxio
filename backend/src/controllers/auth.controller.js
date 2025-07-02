@@ -1,6 +1,10 @@
 const User = require('../models/user.model');
 const crypto = require('crypto');
 const sendMail = require('../utils/sendMail'); // À implémenter avec nodemailer
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const jwt = require('jsonwebtoken');
+const sendSMS = require('../utils/sendSMS'); // À implémenter pour l'envoi de SMS
 
 /**
  * @swagger
@@ -158,7 +162,7 @@ exports.getMe = async (req, res) => {
  * @swagger
  * /api/auth/forgot-password:
  *   post:
- *     summary: Demander la réinitialisation du mot de passe (envoi OTP par email)
+ *     summary: Demander la réinitialisation du mot de passe (envoi OTP par email ou téléphone)
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -166,19 +170,22 @@ exports.getMe = async (req, res) => {
  *         application/json:
  *           schema:
  *             type: object
- *             required: [email]
  *             properties:
  *               email:
  *                 type: string
+ *               phone:
+ *                 type: string
  *     responses:
  *       200:
- *         description: OTP envoyé par email
+ *         description: OTP envoyé par email ou SMS
  *       404:
  *         description: Utilisateur non trouvé
  */
 exports.forgotPassword = async (req, res) => {
-  const { email } = req.body;
-  const user = await User.findOne({ email });
+  const { email, phone } = req.body;
+  let user;
+  if (email) user = await User.findOne({ email });
+  else if (phone) user = await User.findOne({ phone });
   if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
 
   // Génère un code OTP à 6 chiffres
@@ -187,10 +194,13 @@ exports.forgotPassword = async (req, res) => {
   user.otpExpires = Date.now() + 15 * 60 * 1000; // 15 minutes
   await user.save();
 
-  // Envoie l'OTP par email
-  await sendMail(user.email, 'Votre code OTP', `Votre code de vérification est : ${otp}`);
+  if (email) {
+    await sendMail(user.email, 'Votre code OTP', `Votre code de vérification est : ${otp}`);
+  } else if (phone) {
+    await sendSMS(user.phone, `Votre code OTP Vaxio : ${otp}`);
+  }
 
-  res.status(200).json({ message: "Code OTP envoyé par email" });
+  res.status(200).json({ message: "Code OTP envoyé" });
 };
 
 /**
@@ -205,13 +215,16 @@ exports.forgotPassword = async (req, res) => {
  *         application/json:
  *           schema:
  *             type: object
- *             required: [email, code, password]
  *             properties:
  *               email:
+ *                 type: string
+ *               phone:
  *                 type: string
  *               code:
  *                 type: string
  *               password:
+ *                 type: string
+ *               confirmPassword:
  *                 type: string
  *     responses:
  *       200:
@@ -220,10 +233,15 @@ exports.forgotPassword = async (req, res) => {
  *         description: Code OTP invalide ou expiré
  */
 exports.resetPassword = async (req, res) => {
-  const { email, code, password } = req.body;
-  const user = await User.findOne({ email });
+  const { email, phone, code, password, confirmPassword } = req.body;
+  let user;
+  if (email) user = await User.findOne({ email });
+  else if (phone) user = await User.findOne({ phone });
   if (!user || user.otpCode !== code || !user.otpExpires || user.otpExpires < Date.now()) {
     return res.status(400).json({ message: "Code OTP invalide ou expiré" });
+  }
+  if (password !== confirmPassword) {
+    return res.status(400).json({ message: "Les mots de passe ne correspondent pas" });
   }
   user.password = password;
   user.otpCode = undefined;
@@ -262,4 +280,61 @@ const sendTokenResponse = (user, statusCode, res) => {
       createdAt: user.createdAt
     }
   });
+};
+
+// Google OAuth config
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: process.env.GOOGLE_CALLBACK_URL,
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    let user = await User.findOne({ email: profile.emails[0].value });
+    if (!user) {
+      user = await User.create({
+        name: profile.displayName,
+        email: profile.emails[0].value,
+        password: crypto.randomBytes(20).toString('hex'), // mot de passe aléatoire
+        googleId: profile.id
+      });
+    }
+    return done(null, user);
+  } catch (err) {
+    return done(err, null);
+  }
+}));
+
+/**
+ * @swagger
+ * /api/auth/google:
+ *   get:
+ *     summary: Authentification Google (initiation)
+ *     tags: [Auth]
+ *     responses:
+ *       302:
+ *         description: Redirige vers Google
+ */
+exports.googleAuth = passport.authenticate('google', { scope: ['profile', 'email'] });
+
+/**
+ * @swagger
+ * /api/auth/google/callback:
+ *   get:
+ *     summary: Callback Google OAuth
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Connexion réussie avec Google
+ *       401:
+ *         description: Échec de l'authentification Google
+ */
+exports.googleCallback = (req, res, next) => {
+  passport.authenticate('google', { session: false }, (err, user) => {
+    if (err || !user) {
+      return res.status(401).json({ success: false, message: 'Google Auth failed' });
+    }
+    // Générer un JWT
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    res.redirect(`${process.env.FRONTEND_URL}/login?token=${token}`);
+  })(req, res, next);
 }; 

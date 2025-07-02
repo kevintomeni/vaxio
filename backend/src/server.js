@@ -25,6 +25,12 @@ mongoose.connect(config.mongoUri)
   .then(() => console.log('Connecté à MongoDB'))
   .catch(err => console.error('Erreur de connexion à MongoDB:', err));
 
+// Gestion d'erreur globale
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ success: false, message: 'Erreur serveur', error: err.message });
+});
+
 // Démarrage du serveur
 app.listen(config.port, () => {
   console.log(`Serveur démarré sur le port ${config.port}`);

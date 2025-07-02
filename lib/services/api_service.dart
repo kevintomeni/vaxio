@@ -129,6 +129,53 @@ class ApiService {
     }
   }
 
+  Future<Map<String, dynamic>> loginWithGoogle(String idToken) async {
+    try {
+      final response = await _dio.post('/auth/google-mobile', data: {
+        'idToken': idToken,
+      });
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response?.data['message'] ?? AppConstants.serverError);
+      }
+      throw Exception(AppConstants.networkError);
+    }
+  }
+
+  Future<Map<String, dynamic>> forgotPassword({String? email, String? phone}) async {
+    try {
+      final response = await _dio.post('/auth/forgot-password', data: {
+        if (email != null) 'email': email,
+        if (phone != null) 'phone': phone,
+      });
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response?.data['message'] ?? AppConstants.serverError);
+      }
+      throw Exception(AppConstants.networkError);
+    }
+  }
+
+  Future<Map<String, dynamic>> resetPassword({String? email, String? phone, required String code, required String password, required String confirmPassword}) async {
+    try {
+      final response = await _dio.post('/auth/reset-password', data: {
+        if (email != null) 'email': email,
+        if (phone != null) 'phone': phone,
+        'code': code,
+        'password': password,
+        'confirmPassword': confirmPassword,
+      });
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response?.data['message'] ?? AppConstants.serverError);
+      }
+      throw Exception(AppConstants.networkError);
+    }
+  }
+
   Exception _handleError(DioException error) {
     switch (error.type) {
       case DioExceptionType.connectionTimeout:

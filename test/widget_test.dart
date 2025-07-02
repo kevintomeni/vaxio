@@ -8,7 +8,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
-import 'package:vaxio/app.dart';
 import 'package:vaxio/core/theme/theme_notifier.dart';
 import 'package:vaxio/views/login_view.dart';
 import 'package:vaxio/controllers/auth_controller.dart';

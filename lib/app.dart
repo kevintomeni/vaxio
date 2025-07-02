@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/theme/app_theme.dart';
-import 'core/theme/theme_notifier.dart';
+import 'cubit/theme_cubit.dart';
 import 'core/routes/app_routes.dart';
 import 'views/splash_screen.dart';
 import 'views/onboarding_screen.dart';
@@ -10,7 +10,6 @@ import 'views/register_page.dart';
 import 'views/forgot_password_page.dart';
 import 'views/verify_email_page.dart';
 import 'views/home_view.dart';
-import 'controllers/auth_controller.dart';
 import 'core/constants/app_constants.dart';
 
 class VaxioApp extends StatelessWidget {
@@ -18,24 +17,32 @@ class VaxioApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeNotifier>(context);
-    return MaterialApp(
-      title: AppConstants.appName,
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      themeMode: theme.mode,
-      initialRoute: AppRoutes.splash,
-      routes: {
-        AppRoutes.splash: (_) => const SplashScreen(),
-        AppRoutes.onboarding: (_) => const OnboardingScreen(),
-        AppRoutes.login: (_) => const LoginView(),
-        AppRoutes.register: (_) => const RegisterPage(),
-        AppRoutes.forgot: (_) => const ForgotPasswordPage(),
-        AppRoutes.verify: (context) {
-          final args = ModalRoute.of(context)!.settings.arguments as String;
-          return VerifyEmailPage(email: args);
-        },
-        AppRoutes.home: (_) => const HomeView(),
+    return BlocBuilder<ThemeCubit, ThemeMode>(
+      builder: (context, mode) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: AppConstants.appName,
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          themeMode: mode,
+          initialRoute: AppRoutes.splash,
+          routes: {
+            AppRoutes.splash: (_) => const SplashScreen(),
+            AppRoutes.onboarding: (_) => const OnboardingScreen(),
+            AppRoutes.login: (_) => const LoginView(),
+            AppRoutes.register: (_) => const RegisterPage(),
+            AppRoutes.forgot: (_) => const ForgotPasswordPage(),
+            AppRoutes.verify: (context) {
+              final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+              return VerifyEmailPage(contact: args['contact'], otp: args['otp']);
+            },
+            AppRoutes.home: (_) => const HomeView(),
+            AppRoutes.otp: (context) {
+              final args = ModalRoute.of(context)!.settings.arguments as String;
+              return OTPPage(contact: args);
+            },
+          },
+        );
       },
     );
   }
