@@ -5,6 +5,7 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const jwt = require('jsonwebtoken');
 const sendSMS = require('../utils/sendSMS'); // À implémenter pour l'envoi de SMS
+const { OAuth2Client } = require('google-auth-library');
 
 /**
  * @swagger
@@ -337,4 +338,37 @@ exports.googleCallback = (req, res, next) => {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.redirect(`${process.env.FRONTEND_URL}/login?token=${token}`);
   })(req, res, next);
+};
+
+exports.googleMobile = async (req, res) => {
+  try {
+    const { idToken } = req.body;
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    let user = await User.findOne({ email: payload.email });
+    if (!user) {
+      user = await User.create({
+        name: payload.name,
+        email: payload.email,
+        password: crypto.randomBytes(20).toString('hex'),
+        googleId: payload.sub
+      });
+    }
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    res.status(200).json({
+      success: true,
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+      }
+    });
+  } catch (err) {
+    res.status(401).json({ success: false, message: 'Google Auth failed', error: err.message });
+  }
 }; 

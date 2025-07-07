@@ -75,8 +75,8 @@ class VerifyEmailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _newPassCtrl = TextEditingController();
-    final _confirmPassCtrl = TextEditingController();
+    final newPassCtrl = TextEditingController();
+    final confirmPassCtrl = TextEditingController();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Réinitialiser votre mot de passe')),
@@ -97,13 +97,13 @@ class VerifyEmailPage extends StatelessWidget {
               const Text('Entrez votre nouveau mot de passe :'),
               const SizedBox(height: 16),
               TextField(
-                controller: _newPassCtrl,
+                controller: newPassCtrl,
                 decoration: const InputDecoration(labelText: 'Nouveau mot de passe'),
                 obscureText: true,
               ),
               const SizedBox(height: 16),
               TextField(
-                controller: _confirmPassCtrl,
+                controller: confirmPassCtrl,
                 decoration: const InputDecoration(labelText: 'Confirmer le mot de passe'),
                 obscureText: true,
               ),
@@ -115,8 +115,8 @@ class VerifyEmailPage extends StatelessWidget {
                     onPressed: isLoading
                         ? null
                         : () {
-                            final newPass = _newPassCtrl.text.trim();
-                            final confirmPass = _confirmPassCtrl.text.trim();
+                            final newPass = newPassCtrl.text.trim();
+                            final confirmPass = confirmPassCtrl.text.trim();
                             if (isPhone) {
                               context.read<AuthCubit>().resetPassword(
                                 phone: contact,

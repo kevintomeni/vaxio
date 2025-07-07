@@ -1,6 +1,12 @@
+const twilio = require('twilio');
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = twilio(accountSid, authToken);
+
 module.exports = async function sendSMS(phone, message) {
-  // Ici, tu peux intégrer Twilio, Nexmo, etc.
-  console.log(`[MOCK SMS] Envoi à ${phone} : ${message}`);
-  // Simule l'envoi
-  return true;
+  return client.messages.create({
+    body: message,
+    from: process.env.TWILIO_PHONE,
+    to: phone
+  });
 }; 

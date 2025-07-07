@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, getMe, forgotPassword, resetPassword, logout, googleAuth, googleCallback } = require('../controllers/auth.controller');
+const { register, login, getMe, forgotPassword, resetPassword, logout, googleAuth, googleCallback, googleMobile } = require('../controllers/auth.controller');
 const { protect } = require('../middleware/auth.middleware');
 
 router.post('/register', register);
@@ -11,6 +11,6 @@ router.post('/reset-password', resetPassword);
 router.post('/logout', logout);
 router.get('/google', googleAuth);
 router.get('/google/callback', googleCallback);
-router.post('/google-mobile', require('../controllers/auth.controller').googleMobile);
+router.post('/google-mobile', googleMobile);
 
 module.exports = router; 
