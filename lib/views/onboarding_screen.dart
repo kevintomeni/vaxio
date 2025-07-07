@@ -1,117 +1,115 @@
 import 'package:flutter/material.dart';
-import '../core/theme/app_colors.dart';
-import '../widgets/onboarding_dot.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class OnboardingScreen extends StatefulWidget {
+class OnboardingCubit extends Cubit<bool> {
+  OnboardingCubit() : super(false);
+  void complete() => emit(true);
+}
+
+class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
-}
-
-class _OnboardingScreenState extends State<OnboardingScreen> {
-  final PageController _controller = PageController();
-  int _currentPage = 0;
-
-  final List<Map<String, String>> _pages = [
-    {
-      'image': 'assets/images/splash1.png',
-      'title': 'Prenez le contrôle de votre santé',
-      'desc': 'Accédez aux dossiers cliniques, gérez les rendez-vous, les vaccins, les suivis et bien plus encore.',
-    },
-    {
-      'image': 'assets/images/splash2.png',
-      'title': 'Prenez le contrôle de votre santé',
-      'desc': 'Accédez aux dossiers cliniques, gérez les rendez-vous, les vaccins, les suivis et bien plus encore.',
-    },
-    {
-      'image': 'assets/images/splash3.png',
-      'title': 'Prenez le contrôle de votre santé',
-      'desc': 'Accédez aux dossiers cliniques, gérez les rendez-vous, les vaccins, les suivis et bien plus encore.',
-    },
-  ];
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: PageView.builder(
-                controller: _controller,
-                itemCount: _pages.length,
-                onPageChanged: (i) => setState(() => _currentPage = i),
-                itemBuilder: (context, i) => Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
+    return BlocProvider(
+      create: (_) => OnboardingCubit(),
+      child: BlocListener<OnboardingCubit, bool>(
+        listener: (context, completed) {
+          if (completed) {
+            Navigator.pushReplacementNamed(context, '/login');
+          }
+        },
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: Stack(
+            children: [
+              // Fond bleu et formes abstraites
+              Positioned.fill(
+                child: Container(
+                  color: const Color(0xFF1877F2), // Bleu vif
+                  child: Stack(
                     children: [
-                      Image.asset(_pages[i]['image']!, height: 200),
-                      const SizedBox(height: 32),
-                      Text(
-                        _pages[i]['title']!,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        _pages[i]['desc']!,
-                        style: const TextStyle(
-                          color: Colors.black54,
-                          fontSize: 15,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+                      // Ajoute ici des Positioned pour les formes vertes et les gélules si tu veux
                     ],
                   ),
                 ),
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                _pages.length,
-                (i) => OnboardingDot(isActive: i == _currentPage),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // Contenu principal
+              Column(
                 children: [
-                  if (_currentPage > 0)
-                    TextButton(
-                      onPressed: () {
-                        _controller.previousPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.ease,
-                        );
-                      },
-                      child: const Text('Précédent'),
-                    )
-                  else
-                    const SizedBox(width: 80),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_currentPage < _pages.length - 1) {
-                        _controller.nextPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.ease,
-                        );
-                      } else {
-                        Navigator.pushReplacementNamed(context, '/login');
-                      }
-                    },
-                    child: Text(_currentPage == _pages.length - 1 ? 'Terminer' : 'Suivant'),
+                  const SizedBox(height: 60),
+                  // Logo et nom
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Remplace par ton logo si besoin
+                      Icon(Icons.local_hospital, color: Colors.white, size: 32),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Self Care',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 30),
+                  // Image du médecin
+                  Expanded(
+                    child: Center(
+                      child: Image.asset(
+                        'assets/images/splash.png',
+                        height: 300,
+                      ),
+                    ),
+                  ),
+                  // Slogan
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+                    ),
+                    child: Column(
+                      children: [
+                        const Text(
+                          'Manage your health and happy future',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              context.read<OnboardingCubit>().complete();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF1877F2),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                            ),
+                            child: const Text(
+                              'Get started',
+                              style: TextStyle(fontSize: 18, color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

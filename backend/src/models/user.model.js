@@ -41,6 +41,21 @@ const userSchema = new mongoose.Schema({
     sparse: true,
     match: [/^\+?[0-9]{7,15}$/, 'Veuillez fournir un numéro de téléphone valide']
   },
+  role: {
+    type: String,
+    enum: ['patient', 'doctor'],
+    default: 'patient',
+  },
+  gender: {
+    type: String,
+    enum: ['male', 'female'],
+  },
+  birthday: {
+    type: Date,
+  },
+  location: {
+    type: String,
+  },
 });
 
 // Crypter le mot de passe avant la sauvegarde
