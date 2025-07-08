@@ -15,6 +15,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mockito/mockito.dart';
 import 'package:vaxio/services/api_service.dart';
 import 'package:vaxio/views/register_page.dart';
+import 'package:get/get.dart';
+import 'package:vaxio/core/theme/theme_notifier.dart';
 
 // Crée une classe mock
 class MockApiService extends Mock implements ApiService {}
@@ -96,12 +98,14 @@ void main() {
 
     testWidgets('Affiche le formulaire de connexion', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MultiProvider(
-          providers: [
-            ChangeNotifierProvider(create: (_) => authController),
-            ChangeNotifierProvider(create: (_) => ThemeNotifier()),
-          ],
-          child: const MaterialApp(home: LoginView()),
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              Get.put(AuthController());
+              Get.put(ThemeController());
+              return const LoginView();
+            },
+          ),
         ),
       );
       expect(find.text('Welcome\nBack.'), findsOneWidget);
@@ -110,15 +114,15 @@ void main() {
     });
 
     testWidgets('Affiche le formulaire d\'inscription et soumet', (WidgetTester tester) async {
-      final authController = AuthController();
-
       await tester.pumpWidget(
-        MultiProvider(
-          providers: [
-            ChangeNotifierProvider(create: (_) => authController),
-            ChangeNotifierProvider(create: (_) => ThemeNotifier()),
-          ],
-          child: const MaterialApp(home: RegisterPage()),
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              Get.put(AuthController());
+              Get.put(ThemeController());
+              return const RegisterPage();
+            },
+          ),
         ),
       );
 

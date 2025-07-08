@@ -6,6 +6,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const jwt = require('jsonwebtoken');
 const sendSMS = require('../utils/sendSMS'); // À implémenter pour l'envoi de SMS
 const { OAuth2Client } = require('google-auth-library');
+const OtpModel = require('../models/otp.model');
 
 /**
  * @swagger
@@ -371,4 +372,104 @@ exports.googleMobile = async (req, res) => {
   } catch (err) {
     res.status(401).json({ success: false, message: 'Google Auth failed', error: err.message });
   }
+};
+
+/**
+ * @swagger
+ * /api/auth/send-otp:
+ *   post:
+ *     summary: Envoi d'un code OTP par email
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Code OTP envoyé
+ *       400:
+ *         description: Email invalide
+ */
+exports.sendOtp = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ message: 'Email invalide' });
+  }
+
+  const code = Math.floor(1000 + Math.random() * 9000).toString(); // 4 chiffres
+  await OtpModel.create({ email, code, expiresAt: Date.now() + 2 * 60 * 1000 }); // 2 minutes
+  await sendMail(email, `Votre code OTP : ${code}`);
+  res.json({ message: 'OTP envoyé' });
+};
+
+/**
+ * @swagger
+ * /api/auth/verify-otp:
+ *   post:
+ *     summary: Vérifier un code OTP
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               code:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: OTP validé
+ *       400:
+ *         description: Code invalide ou expiré
+ */
+exports.verifyOtp = async (req, res) => {
+  const { email, code } = req.body;
+  const otp = await OtpModel.findOne({ email, code });
+  if (!otp || otp.expiresAt < Date.now()) {
+    return res.status(400).json({ message: 'Code invalide ou expiré' });
+  }
+  // Supprime le code après usage
+  await OtpModel.deleteOne({ _id: otp._id });
+  res.json({ message: 'OTP validé' });
+};
+
+/**
+ * @swagger
+ * /api/auth/resend-otp:
+ *   post:
+ *     summary: Renvoyer le code OTP
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Code OTP renvoyé
+ *       400:
+ *         description: Email invalide
+ */
+exports.resendOtp = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ message: 'Email invalide' });
+  }
+
+  const code = Math.floor(1000 + Math.random() * 9000).toString(); // 4 chiffres
+  await OtpModel.create({ email, code, expiresAt: Date.now() + 2 * 60 * 1000 }); // 2 minutes
+  await sendMail(email, `Votre code OTP : ${code}`);
+  res.json({ message: 'OTP renvoyé' });
 }; 

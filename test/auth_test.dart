@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vaxio/views/login_view.dart';
-import 'package:vaxio/cubit/auth_cubit.dart';
+import 'package:get/get.dart';
+
+import 'package:vaxio/controllers/auth_controller.dart';
 
 void main() {
   testWidgets('Affiche une erreur si email invalide', (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
-        home: BlocProvider<AuthCubit>(
-          create: (_) => AuthCubit(),
-          child: const LoginView(),
+        home: Builder(
+          builder: (context) {
+            Get.put(AuthController());
+            return const LoginView();
+          },
         ),
       ),
     );
@@ -24,9 +28,11 @@ void main() {
   testWidgets('Affiche une erreur si mot de passe trop court', (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
-        home: BlocProvider<AuthCubit>(
-          create: (_) => AuthCubit(),
-          child: const LoginView(),
+        home: Builder(
+          builder: (context) {
+            Get.put(AuthController());
+            return const LoginView();
+          },
         ),
       ),
     );

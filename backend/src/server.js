@@ -7,6 +7,9 @@ const swaggerSpec = require('./config/swagger');
 
 // Routes
 const authRoutes = require('./routes/auth.routes');
+const doctorRoutes = require('./routes/doctor.routes');
+const appointmentRoutes = require('./routes/appointment.routes');
+const categoryRoutes = require('./routes/category.routes');
 
 const app = express();
 
@@ -19,6 +22,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/doctors', doctorRoutes);
+app.use('/api/appointments', appointmentRoutes);
+app.use('/api/categories', categoryRoutes);
 
 // Connexion à MongoDB
 mongoose.connect(config.mongoUri)

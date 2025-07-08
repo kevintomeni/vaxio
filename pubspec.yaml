@@ -55,6 +55,10 @@ dependencies:
   # Authentication
   google_sign_in: ^6.1.5
 
+  get: ^4.6.5
+
+  pin_code_fields: ^8.0.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

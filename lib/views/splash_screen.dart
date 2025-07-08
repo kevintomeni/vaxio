@@ -67,7 +67,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                AnimatedLogo(animation: _logoAnimation),
+               AnimatedLogo(animation: _logoAnimation),
                 const SizedBox(height: 24),
                 AnimatedText(animation: _textAnimation, text: 'Vaxio'),
               ],

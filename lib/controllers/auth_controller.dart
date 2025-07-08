@@ -3,16 +3,18 @@ import 'package:vaxio/core/constants/app_constants.dart';
 import '../models/user_model.dart';
 import '../services/api_service.dart';
 import '../services/storage_service.dart';
+import 'package:get/get.dart';
 
 class AuthController extends ChangeNotifier {
   UserModel? _currentUser;
-  bool _isLoading = false;
-  String? _error;
+  final RxBool _isLoading = false.obs;
+  final RxnString _error = RxnString();
 
   UserModel? get currentUser => _currentUser;
-  bool get isLoading => _isLoading;
-  String? get error => _error;
+  bool get isLoading => _isLoading.value;
+  String? get error => _error.value;
   bool get isLoggedIn => _currentUser != null;
+  RxnString get errorRx => _error;
 
   AuthController() {
     _loadUserFromStorage();
@@ -25,8 +27,8 @@ class AuthController extends ChangeNotifier {
   }
 
   Future<bool> login(String email, String password) async {
-    _setLoading(true);
-    _clearError();
+    _isLoading.value = true;
+    _error.value = null;
 
     try {
       final response = await ApiService.instance.post(
@@ -48,21 +50,21 @@ class AuthController extends ChangeNotifier {
         await storage.saveToken(token);
 
         _currentUser = user;
-        _setLoading(false);
+        _isLoading.value = false;
         return true;
       } else {
-        _setError('Email ou mot de passe incorrect');
+        _error.value = 'Email ou mot de passe incorrect';
         return false;
       }
     } catch (e) {
-      _setError(e.toString());
+      _error.value = e.toString();
       return false;
     }
   }
 
   Future<bool> register(String name, String email, String password) async {
-    _setLoading(true);
-    _clearError();
+    _isLoading.value = true;
+    _error.value = null;
 
     try {
       final response = await ApiService.instance.post(
@@ -85,21 +87,21 @@ class AuthController extends ChangeNotifier {
         await storage.saveToken(token);
 
         _currentUser = user;
-        _setLoading(false);
+        _isLoading.value = false;
         return true;
       } else {
-        _setError('Erreur lors de l\'inscription');
+        _error.value = 'Erreur lors de l\'inscription';
         return false;
       }
     } catch (e) {
-      _setError(e.toString());
+      _error.value = e.toString();
       return false;
     }
   }
   
 Future<bool> forgotPassword(String email) async {
-  _setLoading(true);
-  _clearError();
+  _isLoading.value = true;
+  _error.value = null;
   try {
     final response = await ApiService.instance.post(
       AppConstants.forgotPasswordEndpoint,
@@ -107,17 +109,17 @@ Future<bool> forgotPassword(String email) async {
         'email': email,
       },
     );
-    _setLoading(false);
+    _isLoading.value = false;
     return response.data['success'] == true;
   } catch (e) {
-    _setError(e.toString().replaceFirst('Exception: ', ''));
+    _error.value = e.toString().replaceFirst('Exception: ', '');
     return false;
   }
 }
 
 Future<bool> resetPassword(String email, String code, String newPassword, String confirmPassword) async {
-  _setLoading(true);
-  _clearError();
+  _isLoading.value = true;
+  _error.value = null;
   try {
     final response = await ApiService.instance.post(
       AppConstants.resetPasswordEndpoint,
@@ -128,16 +130,16 @@ Future<bool> resetPassword(String email, String code, String newPassword, String
         'confirm_password': newPassword,
       },
     );
-    _setLoading(false);
+    _isLoading.value = false;
     return response.data['success'] == true;
   } catch (e) {
-    _setError(e.toString().replaceFirst('Exception: ', ''));
+    _error.value = e.toString().replaceFirst('Exception: ', '');
     return false;
   }
 }
 
   Future<void> logout() async {
-    _setLoading(true);
+    _isLoading.value = true;
     
     try {
       final storage = await StorageService.instance;
@@ -145,25 +147,32 @@ Future<bool> resetPassword(String email, String code, String newPassword, String
       await storage.removeToken();
       
       _currentUser = null;
-      _setLoading(false);
+      _isLoading.value = false;
     } catch (e) {
-      _setError(e.toString());
+      _error.value = e.toString();
     }
   }
 
   void _setLoading(bool loading) {
-    _isLoading = loading;
+    _isLoading.value = loading;
     notifyListeners();
   }
 
   void _setError(String error) {
-    _error = error;
-    _isLoading = false;
+    _error.value = error;
+    _isLoading.value = false;
     notifyListeners();
   }
 
   void _clearError() {
-    _error = null;
+    _error.value = null;
     notifyListeners();
+  }
+
+  // Authentification Google
+  Future<void> loginWithGoogle(String idToken) async {
+    // TODO: Implémente la logique d'authentification Google ici
+    // Exemple : envoie le token à ton backend, récupère l'utilisateur, etc.
+    // Mets à jour isLoading, error, currentUser selon le résultat
   }
 } 

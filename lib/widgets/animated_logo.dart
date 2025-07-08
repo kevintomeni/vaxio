@@ -13,7 +13,7 @@ class AnimatedLogo extends StatelessWidget {
         offset: Offset(0, animation.value),
         child: child,
       ),
-      child: Image.asset('assets/images/logo.png', height: size), // Place ton logo ici
+      child: const Icon(Icons.health_and_safety, color: Colors.white, size: 50),
     );
   }
 }
