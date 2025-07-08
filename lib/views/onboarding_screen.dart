@@ -23,100 +23,121 @@ class OnboardingScreen extends StatelessWidget {
     return BlocListener<OnboardingBloc, OnboardingState>(
       listener: (context, state) {
         if (state is OnboardingDone) {
-          Navigator.pushReplacementNamed(context, '/role-selection');
+          Navigator.pushReplacementNamed(context, '/login');
         }
       },
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: Stack(
-          children: [
-            // Fond bleu et formes abstraites
-            Positioned.fill(
-              child: Container(
-                color: const Color(0xFF1877F2), // Bleu vif
-                child: Stack(
+        body: SafeArea(
+          child: Column(
+            children: [
+              const SizedBox(height: 32),
+              // Logo
+              Image.asset('assets/images/logo.png', height: 48),
+              const SizedBox(height: 24),
+              const Text(
+                "Bienvenue sur Vaxio",
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 32),
+                child: Text(
+                  "Gérez votre santé et votre futur en toute simplicité.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 32),
+              Expanded(
+                child: PageView(
                   children: [
-                    // Ajoute ici des Positioned pour les formes vertes et les gélules si tu veux
+                    _OnboardingPage(
+                      image: 'assets/images/splash1.png',
+                      title: "Suivi vaccinal",
+                      description: "Gardez une trace de vos vaccins et rappels.",
+                    ),
+                    _OnboardingPage(
+                      image: 'assets/images/splash2.png',
+                      title: "Rendez-vous médicaux",
+                      description: "Prenez rendez-vous facilement avec des professionnels.",
+                    ),
+                    _OnboardingPage(
+                      image: 'assets/images/splash3.png',
+                      title: "Notifications & rappels",
+                      description: "Recevez des rappels pour ne rien oublier.",
+                    ),
                   ],
                 ),
               ),
-            ),
-            // Contenu principal
-            Column(
-              children: [
-                const SizedBox(height: 20),
-                // Logo et nom
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.health_and_safety, color: Colors.white, size: 32),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Vaxio',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      context.read<OnboardingBloc>().add(OnboardingCompleted());
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF1877F2),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 30),
-                // Image du médecin
-                Expanded(
-                  child: Center(
-                    child: Image.asset(
-                      'assets/images/splash.jpg',
-                      height: 900,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
+                    child: const Text(
+                      'Commencer',
+                      style: TextStyle(fontSize: 18, color: Colors.white),
                     ),
                   ),
                 ),
-                // Slogan
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-                  ),
-                  child: Column(
-                    children: [
-                      const Text(
-                        'Manage your health and happy future',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () => context.read<OnboardingBloc>().add(OnboardingCompleted()),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF1877F2),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                          ),
-                          child: const Text(
-                            'Get started',
-                            style: TextStyle(fontSize: 18, color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
+    );
+  }
+}
+
+class _OnboardingPage extends StatelessWidget {
+  final String image;
+  final String title;
+  final String description;
+
+  const _OnboardingPage({
+    required this.image,
+    required this.title,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Image.asset(image, height: 220),
+        const SizedBox(height: 24),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Text(
+            description,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.black54, fontSize: 15),
+          ),
+        ),
+      ],
     );
   }
 }

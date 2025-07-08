@@ -16,7 +16,6 @@ class AnimatedText extends StatelessWidget {
       child: Text(
         text,
         style: const TextStyle(
-          fontFamily: 'Montserrat',
           fontWeight: FontWeight.bold,
           fontSize: 36,
           color: Colors.white,

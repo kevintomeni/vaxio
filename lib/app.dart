@@ -13,6 +13,8 @@ import 'core/constants/app_constants.dart';
 import 'views/profile_info_page.dart';
 import 'bloc/theme/theme_bloc.dart';
 import 'views/otp_page.dart';
+import 'bloc/role/role_bloc.dart';
+import 'bloc/profile/profile_bloc.dart';
 
 class VaxioApp extends StatelessWidget {
   const VaxioApp({super.key});
@@ -33,7 +35,10 @@ class VaxioApp extends StatelessWidget {
             routes: {
               AppRoutes.splash: (context) => const SplashScreen(),
               AppRoutes.onboarding: (context) => const OnboardingScreen(),
-              AppRoutes.roleSelection: (context) => const RoleSelectionPage(),
+              AppRoutes.roleSelection: (context) => BlocProvider(
+                create: (_) => RoleBloc(),
+                child: const RoleSelectionPage(),
+              ),
               AppRoutes.login: (context) => const LoginView(),
               AppRoutes.register: (context) => const RegisterPage(),
               AppRoutes.forgot: (context) => const ResetPasswordPage(),
@@ -42,7 +47,10 @@ class VaxioApp extends StatelessWidget {
                 return OTPVerificationPage(email: args?['email'] ?? '');
               },
               AppRoutes.home: (context) => const HomeView(),
-              AppRoutes.profileInfo: (context) => const ProfileInfoPage(),
+              AppRoutes.profileInfo: (context) => BlocProvider(
+                create: (_) => ProfileBloc(),
+                child: const ProfileInfoPage(),
+              ),
             },
           );
         },

@@ -13,7 +13,6 @@ class AnimatedLogo extends StatelessWidget {
         offset: Offset(0, animation.value),
         child: child,
       ),
-      child: const Icon(Icons.health_and_safety, color: Colors.white, size: 50),
-    );
+      child: Image.asset('assets/images/logo.png', height: 48));
   }
 }
