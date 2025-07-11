@@ -27,48 +27,59 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           setState(() => _error = state.message);
         }
       },
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              const Text('Entrez votre email pour recevoir un code de réinitialisation'),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _emailCtrl,
-                decoration: const InputDecoration(labelText: 'Email'),
-                keyboardType: TextInputType.emailAddress,
-                validator: (v) {
-                  if (v == null || v.isEmpty) return "L'email est requis";
-                  if (!v.contains('@')) return "Email invalide";
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              if (_error != null)
-                Text(_error!, style: const TextStyle(color: Colors.red)),
-              BlocBuilder<AuthBloc, AuthState>(
-                builder: (context, state) {
-                  final isLoading = state is AuthLoading;
-                  return ElevatedButton(
-                    onPressed: isLoading
-                        ? null
-                        : () {
-                            setState(() => _error = null);
-                            if (_formKey.currentState!.validate()) {
-                              context.read<AuthBloc>().add(
-                                AuthForgotPasswordRequested(_emailCtrl.text),
-                              );
-                            }
-                          },
-                    child: isLoading
-                        ? const CircularProgressIndicator()
-                        : const Text('Envoyer le code'),
-                  );
-                },
-              ),
-            ],
+      child: Scaffold(
+        appBar: AppBar(
+    leading: IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () => Navigator.of(context).maybePop(),
+    ),
+    elevation: 0,
+    backgroundColor: Colors.transparent,
+    foregroundColor: Colors.black,
+  ),
+        body: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                const Text('Entrez votre email pour recevoir un code de réinitialisation'),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _emailCtrl,
+                  decoration: const InputDecoration(labelText: 'Email'),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return "L'email est requis";
+                    if (!v.contains('@')) return "Email invalide";
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                if (_error != null)
+                  Text(_error!, style: const TextStyle(color: Colors.red)),
+                BlocBuilder<AuthBloc, AuthState>(
+                  builder: (context, state) {
+                    final isLoading = state is AuthLoading;
+                    return ElevatedButton(
+                      onPressed: isLoading
+                          ? null
+                          : () {
+                              setState(() => _error = null);
+                              if (_formKey.currentState!.validate()) {
+                                context.read<AuthBloc>().add(
+                                  AuthForgotPasswordRequested(_emailCtrl.text),
+                                );
+                              }
+                            },
+                      child: isLoading
+                          ? const CircularProgressIndicator()
+                          : const Text('Envoyer le code'),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),

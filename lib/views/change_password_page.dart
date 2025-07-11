@@ -29,55 +29,58 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           setState(() => _error = state.message);
         }
       },
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              const Text('Définir un nouveau mot de passe'),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _passCtrl,
-                decoration: const InputDecoration(labelText: 'Nouveau mot de passe'),
-                obscureText: true,
-                validator: (v) => v == null || v.length < 6 ? '6 caractères min.' : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _confirmCtrl,
-                decoration: const InputDecoration(labelText: 'Confirmer le mot de passe'),
-                obscureText: true,
-                validator: (v) => v != _passCtrl.text ? 'Les mots de passe ne correspondent pas' : null,
-              ),
-              const SizedBox(height: 16),
-              if (_error != null)
-                Text(_error!, style: const TextStyle(color: Colors.red)),
-              BlocBuilder<AuthBloc, AuthState>(
-                builder: (context, state) {
-                  final isLoading = state is AuthLoading;
-                  return ElevatedButton(
-                    onPressed: isLoading
-                        ? null
-                        : () {
-                            setState(() => _error = null);
-                            if (_formKey.currentState!.validate()) {
-                              context.read<AuthBloc>().add(
-                                AuthChangePasswordRequested(
-                                  widget.email,
-                                  widget.otp,
-                                  _passCtrl.text,
-                                ),
-                              );
-                            }
-                          },
-                    child: isLoading
-                        ? const CircularProgressIndicator()
-                        : const Text('Changer le mot de passe'),
-                  );
-                },
-              ),
-            ],
+      child: Scaffold(
+        body: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                const Text('Définir un nouveau mot de passe'),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _passCtrl,
+                  decoration: const InputDecoration(labelText: 'Nouveau mot de passe'),
+                  obscureText: true,
+                  validator: (v) => v == null || v.length < 6 ? '6 caractères min.' : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _confirmCtrl,
+                  decoration: const InputDecoration(labelText: 'Confirmer le mot de passe'),
+                  obscureText: true,
+                  validator: (v) => v != _passCtrl.text ? 'Les mots de passe ne correspondent pas' : null,
+                ),
+                const SizedBox(height: 16),
+                if (_error != null)
+                  Text(_error!, style: const TextStyle(color: Colors.red)),
+                BlocBuilder<AuthBloc, AuthState>(
+                  builder: (context, state) {
+                    final isLoading = state is AuthLoading;
+                    return ElevatedButton(
+                      onPressed: isLoading
+                          ? null
+                          : () {
+                              setState(() => _error = null);
+                              if (_formKey.currentState!.validate()) {
+                                context.read<AuthBloc>().add(
+                                  AuthChangePasswordRequested(
+                                    widget.email,
+                                    widget.otp,
+                                    _passCtrl.text,
+                                    _confirmCtrl.text,
+                                  ),
+                                );
+                              }
+                            },
+                      child: isLoading
+                          ? const CircularProgressIndicator()
+                          : const Text('Changer le mot de passe'),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -3,11 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/role/role_bloc.dart';
 import '../bloc/role/role_event.dart';
 import '../bloc/role/role_state.dart';
+import '../models/user_model.dart';
 
 enum UserRole { patient, doctor }
 
 class RoleSelectionPage extends StatelessWidget {
-  const RoleSelectionPage({super.key});
+  final dynamic user;
+  const RoleSelectionPage({Key? key, this.user}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -15,10 +17,19 @@ class RoleSelectionPage extends StatelessWidget {
       listener: (context, state) {
         if (state is RoleChosen) {
           // Navigue vers la page suivante avec le rôle choisi
-          Navigator.pushReplacementNamed(context, '/profile-info', arguments: {'role': state.role});
+          Navigator.pushReplacementNamed(context, '/profile-info', arguments: {'user': user, 'role': state.role});
         }
       },
       child: Scaffold(
+        appBar: AppBar(
+    leading: IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () => Navigator.of(context).maybePop(),
+    ),
+    elevation: 0,
+    backgroundColor: Colors.transparent,
+    foregroundColor: Colors.black,
+  ),
         backgroundColor: const Color(0xFFF8F9FB),
         body: SafeArea(
           child: Column(

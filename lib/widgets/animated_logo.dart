@@ -13,6 +13,6 @@ class AnimatedLogo extends StatelessWidget {
         offset: Offset(0, animation.value),
         child: child,
       ),
-      child: Image.asset('assets/images/logo.png', height: 48));
+      child: Image.asset('assets/images/logo.png', height: 90));
   }
 }

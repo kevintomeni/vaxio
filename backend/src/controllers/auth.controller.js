@@ -2,7 +2,7 @@ const User = require('../models/user.model');
 const crypto = require('crypto');
 const sendMail = require('../utils/sendMail'); // À implémenter avec nodemailer
 const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
+// const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const jwt = require('jsonwebtoken');
 const sendSMS = require('../utils/sendSMS'); // À implémenter pour l'envoi de SMS
 const { OAuth2Client } = require('google-auth-library');
@@ -39,30 +39,19 @@ const OtpModel = require('../models/otp.model');
  */
 exports.register = async (req, res) => {
   try {
+    console.log('Register body:', req.body);
     const { name, email, password } = req.body;
-
-    // Vérifier si l'utilisateur existe
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'Champs manquants' });
+    }
     let user = await User.findOne({ email });
     if (user) {
-      return res.status(400).json({
-        success: false,
-        message: 'Cet email est déjà utilisé'
-      });
+      return res.status(400).json({ message: 'Cet email est déjà utilisé' });
     }
-
-    // Créer l'utilisateur
-    user = await User.create({
-      name,
-      email,
-      password
-    });
-
+    user = await User.create({ name, email, password });
     sendTokenResponse(user, 201, res);
   } catch (err) {
-    res.status(400).json({
-      success: false,
-      message: err.message
-    });
+    res.status(400).json({ message: err && err.message ? err.message : 'Erreur inconnue' });
   }
 };
 
@@ -95,39 +84,20 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    // Valider email & password
     if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Veuillez fournir un email et un mot de passe'
-      });
+      return res.status(400).json({ message: 'Champs manquants' });
     }
-
-    // Vérifier l'utilisateur
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Identifiants invalides'
-      });
+      return res.status(401).json({ message: 'Identifiants invalides' });
     }
-
-    // Vérifier le mot de passe
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        message: 'Identifiants invalides'
-      });
+      return res.status(401).json({ message: 'Identifiants invalides' });
     }
-
     sendTokenResponse(user, 200, res);
   } catch (err) {
-    res.status(400).json({
-      success: false,
-      message: err.message
-    });
+    res.status(400).json({ message: err && err.message ? err.message : 'Erreur inconnue' });
   }
 };
 
@@ -184,10 +154,12 @@ exports.getMe = async (req, res) => {
  *         description: Utilisateur non trouvé
  */
 exports.forgotPassword = async (req, res) => {
-  const { email, phone } = req.body;
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ message: "Email requis" });
+  }
   let user;
   if (email) user = await User.findOne({ email });
-  else if (phone) user = await User.findOne({ phone });
   if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
 
   // Génère un code OTP à 6 chiffres
@@ -198,11 +170,9 @@ exports.forgotPassword = async (req, res) => {
 
   if (email) {
     await sendMail(user.email, 'Votre code OTP', `Votre code de vérification est : ${otp}`);
-  } else if (phone) {
-    await sendSMS(user.phone, `Votre code OTP Vaxio : ${otp}`);
   }
 
-  res.status(200).json({ message: "Code OTP envoyé" });
+  res.status(200).json({ success: true, message: "Code envoyé" });
 };
 
 /**
@@ -235,15 +205,18 @@ exports.forgotPassword = async (req, res) => {
  *         description: Code OTP invalide ou expiré
  */
 exports.resetPassword = async (req, res) => {
-  const { email, phone, code, password, confirmPassword } = req.body;
-  let user;
-  if (email) user = await User.findOne({ email });
-  else if (phone) user = await User.findOne({ phone });
-  if (!user || user.otpCode !== code || !user.otpExpires || user.otpExpires < Date.now()) {
-    return res.status(400).json({ message: "Code OTP invalide ou expiré" });
+  console.log(req.body);
+  const { email, code, password, confirmPassword } = req.body;
+  if (!password || !confirmPassword) {
+    return res.status(400).json({ message: "Champs manquants" });
   }
   if (password !== confirmPassword) {
     return res.status(400).json({ message: "Les mots de passe ne correspondent pas" });
+  }
+  let user;
+  if (email) user = await User.findOne({ email });
+  if (!user || user.otpCode !== code || !user.otpExpires || user.otpExpires < Date.now()) {
+    return res.status(400).json({ message: "Code OTP invalide ou expiré" });
   }
   user.password = password;
   user.otpCode = undefined;
@@ -285,26 +258,26 @@ const sendTokenResponse = (user, statusCode, res) => {
 };
 
 // Google OAuth config
-passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: process.env.GOOGLE_CALLBACK_URL,
-}, async (accessToken, refreshToken, profile, done) => {
-  try {
-    let user = await User.findOne({ email: profile.emails[0].value });
-    if (!user) {
-      user = await User.create({
-        name: profile.displayName,
-        email: profile.emails[0].value,
-        password: crypto.randomBytes(20).toString('hex'), // mot de passe aléatoire
-        googleId: profile.id
-      });
-    }
-    return done(null, user);
-  } catch (err) {
-    return done(err, null);
-  }
-}));
+// passport.use(new GoogleStrategy({
+//   clientID: process.env.GOOGLE_CLIENT_ID,
+//   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+//   callbackURL: process.env.GOOGLE_CALLBACK_URL,
+// }, async (accessToken, refreshToken, profile, done) => {
+//   try {
+//     let user = await User.findOne({ email: profile.emails[0].value });
+//     if (!user) {
+//       user = await User.create({
+//         name: profile.displayName,
+//         email: profile.emails[0].value,
+//         password: crypto.randomBytes(20).toString('hex'), // mot de passe aléatoire
+//         googleId: profile.id
+//       });
+//     }
+//     return done(null, user);
+//   } catch (err) {
+//     return done(err, null);
+//   }
+// }));
 
 /**
  * @swagger
@@ -432,13 +405,21 @@ exports.sendOtp = async (req, res) => {
  */
 exports.verifyOtp = async (req, res) => {
   const { email, code } = req.body;
-  const otp = await OtpModel.findOne({ email, code });
-  if (!otp || otp.expiresAt < Date.now()) {
-    return res.status(400).json({ message: 'Code invalide ou expiré' });
+  if (!email || !code) {
+    return res.status(400).json({ success: false, message: 'Champs manquants' });
   }
+
+  const user = await User.findOne({ email });
+  if (!user || user.otpCode !== code || !user.otpExpires || user.otpExpires < Date.now()) {
+    return res.status(400).json({ success: false, message: 'Code invalide ou expiré' });
+  }
+
   // Supprime le code après usage
-  await OtpModel.deleteOne({ _id: otp._id });
-  res.json({ message: 'OTP validé' });
+  user.otpCode = undefined;
+  user.otpExpires = undefined;
+  await user.save();
+
+  res.json({ success: true, message: 'OTP validé' });
 };
 
 /**

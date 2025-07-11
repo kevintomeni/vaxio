@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:vaxio/bloc/onboarding/onboarding_bloc.dart';
 import '../core/routes/app_routes.dart';
-import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/onboarding/onboarding_state.dart';
 import '../bloc/onboarding/onboarding_event.dart';
@@ -59,17 +58,17 @@ class OnboardingScreen extends StatelessWidget {
               Expanded(
                 child: PageView(
                   children: [
-                    _OnboardingPage(
+                    const _OnboardingPage(
                       image: 'assets/images/splash1.png',
                       title: "Suivi vaccinal",
                       description: "Gardez une trace de vos vaccins et rappels.",
                     ),
-                    _OnboardingPage(
+                    const _OnboardingPage(
                       image: 'assets/images/splash2.png',
                       title: "Rendez-vous médicaux",
                       description: "Prenez rendez-vous facilement avec des professionnels.",
                     ),
-                    _OnboardingPage(
+                    const _OnboardingPage(
                       image: 'assets/images/splash3.png',
                       title: "Notifications & rappels",
                       description: "Recevez des rappels pour ne rien oublier.",

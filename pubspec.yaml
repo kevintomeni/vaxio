@@ -62,6 +62,8 @@ dependencies:
 
   country_picker: ^2.0.20
 
+  flutter_webrtc: ^0.9.40  # ou la dernière version stable
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

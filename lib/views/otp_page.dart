@@ -44,6 +44,15 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
     final minutes = (_seconds ~/ 60).toString().padLeft(1, '0');
     final seconds = (_seconds % 60).toString().padLeft(2, '0');
     return Scaffold(
+      appBar: AppBar(
+    leading: IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () => Navigator.of(context).maybePop(),
+    ),
+    elevation: 0,
+    backgroundColor: Colors.transparent,
+    foregroundColor: Colors.black,
+  ),
       backgroundColor: Colors.white,
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
@@ -60,96 +69,98 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(24),
-            child: Column(
-              children: [
-                const SizedBox(height: 24),
-                // Logo
-                Icon(Icons.add, size: 48, color: Colors.blueAccent),
-                const SizedBox(height: 32),
-                const Text(
-                  'Your Code',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Code sent to your Email',
-                  style: TextStyle(color: Colors.black54),
-                ),
-                const SizedBox(height: 32),
-                PinCodeTextField(
-                  appContext: context,
-                  length: 4,
-                  onChanged: (value) => setState(() => _otp = value),
-                  keyboardType: TextInputType.number,
-                  pinTheme: PinTheme(
-                    shape: PinCodeFieldShape.box,
-                    borderRadius: BorderRadius.circular(12),
-                    fieldHeight: 60,
-                    fieldWidth: 60,
-                    activeColor: Colors.blueAccent,
-                    selectedColor: Colors.blueAccent,
-                    inactiveColor: Colors.grey.shade300,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const SizedBox(height: 24),
+                  // Logo
+                  Icon(Icons.add, size: 48, color: Colors.blueAccent),
+                  const SizedBox(height: 32),
+                  const Text(
+                    'Your Code',
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                   ),
-                ),
-                if (_error != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Text(_error!, style: const TextStyle(color: Colors.red)),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Code sent to your Email',
+                    style: TextStyle(color: Colors.black54),
                   ),
-                const SizedBox(height: 16),
-                Text(
-                  '(${minutes}:${seconds})  Resend Code? ',
-                  style: const TextStyle(color: Colors.black54),
-                ),
-                GestureDetector(
-                  onTap: _seconds == 0
-                      ? () {
-                          // Ajoute ici l'action pour renvoyer le code
-                          context.read<AuthBloc>().add(AuthResendOtpRequested(widget.email));
-                          setState(() {
-                            _seconds = 130;
-                            timer.start();
-                          });
-                        }
-                      : null,
-                  child: Text(
-                    'Click here',
-                    style: TextStyle(
-                      color: _seconds == 0 ? Colors.blue : Colors.grey,
-                      decoration: TextDecoration.underline,
+                  const SizedBox(height: 32),
+                  PinCodeTextField(
+                    appContext: context,
+                    length: 6, // Passage à 6 chiffres
+                    onChanged: (value) => setState(() => _otp = value),
+                    keyboardType: TextInputType.number,
+                    pinTheme: PinTheme(
+                      shape: PinCodeFieldShape.box,
+                      borderRadius: BorderRadius.circular(12),
+                      fieldHeight: 40,
+                      fieldWidth: 40,
+                      activeColor: Colors.blueAccent,
+                      selectedColor: Colors.blueAccent,
+                      inactiveColor: Colors.grey.shade300,
                     ),
                   ),
-                ),
-                const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  child: BlocBuilder<AuthBloc, AuthState>(
-                    builder: (context, state) {
-                      final isLoading = state is AuthLoading;
-                      return ElevatedButton(
-                        onPressed: _otp.length == 4 && !isLoading
-                            ? () {
-                                setState(() => _error = null);
-                                context.read<AuthBloc>().add(
-                                  AuthOtpVerifyRequested(widget.email, _otp),
-                                );
-                              }
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blueAccent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                        ),
-                        child: isLoading
-                            ? const CircularProgressIndicator()
-                            : const Text('Verify', style: TextStyle(fontSize: 18)),
-                      );
-                    },
+                  if (_error != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(_error!, style: const TextStyle(color: Colors.red)),
+                    ),
+                  const SizedBox(height: 16),
+                  Text(
+                    '(${minutes}:${seconds})  Resend Code? ',
+                    style: const TextStyle(color: Colors.black54),
                   ),
-                ),
-              ],
+                  GestureDetector(
+                    onTap: _seconds == 0
+                        ? () {
+                            // Ajoute ici l'action pour renvoyer le code
+                            context.read<AuthBloc>().add(AuthResendOtpRequested(widget.email));
+                            setState(() {
+                              _seconds = 130;
+                              timer.start();
+                            });
+                          }
+                        : null,
+                    child: Text(
+                      'Click here',
+                      style: TextStyle(
+                        color: _seconds == 0 ? Colors.blue : Colors.grey,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: double.infinity,
+                    child: BlocBuilder<AuthBloc, AuthState>(
+                      builder: (context, state) {
+                        final isLoading = state is AuthLoading;
+                        return ElevatedButton(
+                          onPressed: _otp.length == 6 && !isLoading
+                              ? () {
+                                  setState(() => _error = null);
+                                  context.read<AuthBloc>().add(
+                                    AuthOtpVerifyRequested(widget.email, _otp),
+                                  );
+                                }
+                              : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueAccent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          child: isLoading
+                              ? const CircularProgressIndicator()
+                              : const Text('Verify', style: TextStyle(fontSize: 18)),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

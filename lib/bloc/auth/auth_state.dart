@@ -41,3 +41,10 @@ class AuthVerifySuccess extends AuthState {}
 class AuthPasswordChanged extends AuthState {}
 
 class AuthOtpVerified extends AuthState {}
+
+class AuthChangePasswordSuccess extends AuthState {}
+
+class AuthRegisterSuccess extends AuthState {
+  final UserModel user;
+  AuthRegisterSuccess(this.user);
+}

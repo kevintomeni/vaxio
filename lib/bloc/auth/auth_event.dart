@@ -8,7 +8,7 @@ abstract class AuthEvent extends Equatable {
 class AuthLoginRequested extends AuthEvent {
   final String email;
   final String password;
-  AuthLoginRequested(this.email, this.password);
+  AuthLoginRequested({required this.email, required this.password});
 
   @override
   List<Object?> get props => [email, password];
@@ -55,11 +55,12 @@ class AuthGoogleSignInRequested extends AuthEvent {
 class AuthChangePasswordRequested extends AuthEvent {
   final String email;
   final String otp;
-  final String newPassword;
-  AuthChangePasswordRequested(this.email, this.otp, this.newPassword);
+  final String password;
+  final String confirmPassword;
+  AuthChangePasswordRequested(this.email, this.otp, this.password, this.confirmPassword);
 
   @override
-  List<Object?> get props => [email, otp, newPassword];
+  List<Object?> get props => [email, otp, password, confirmPassword];
 }
 
 class AuthOtpVerifyRequested extends AuthEvent {

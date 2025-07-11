@@ -19,7 +19,6 @@ class AnimatedText extends StatelessWidget {
           fontWeight: FontWeight.bold,
           fontSize: 36,
           color: Colors.white,
-          letterSpacing: 2,
         ),
       ),
     );
